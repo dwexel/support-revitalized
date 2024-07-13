@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3 uid="uid://5b2seuemna4v"]
+
+[ext_resource type="Texture2D" uid="uid://cgclj8nt0g1qc" path="res://models/Textures/colormap.png" id="1_ej2nq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vxhu7"]
+resource_name = "colormap"
+cull_mode = 2
+albedo_texture = ExtResource("1_ej2nq")
+texture_filter = 2
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_me5ee"]
+_surfaces = [{
+"aabb": AABB(-0.5, 0, -0.5, 1.00001, 1e-05, 1),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray(2, 0, 0, 0, 1, 0, 1, 0, 3, 0, 2, 0),
+"name": "colormap",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(254, 255, 0, 0, 0, 0, 0, 0, 254, 255, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0)
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_obedb"]
+resource_name = "floor_floor"
+_surfaces = [{
+"aabb": AABB(-0.5, 0, -0.5, 1.00001, 1e-05, 1),
+"attribute_data": PackedByteArray(255, 247, 255, 223, 255, 247, 255, 223, 255, 247, 255, 223, 255, 247, 255, 223),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray(2, 0, 0, 0, 1, 0, 1, 0, 3, 0, 2, 0),
+"material": SubResource("StandardMaterial3D_vxhu7"),
+"name": "colormap",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(254, 255, 0, 0, 0, 0, 255, 255, 254, 255, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 255, 127, 255, 191, 255, 127, 255, 191, 255, 127, 255, 191, 255, 127, 255, 191)
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_me5ee")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_l7037"]
+points = PackedVector3Array(0.507937, 0.00793651, 0.507937, -0.507937, -0.00793651, -0.507937, -0.507937, 0.00793651, -0.507937, 0.507937, -0.00793651, -0.507937, -0.507937, -0.00793651, 0.507937, -0.507937, 0.00793651, 0.507937, 0.507937, 0.00793651, -0.507937, 0.507937, -0.00793651, 0.507937)
+
+[node name="floor" type="StaticBody3D"]
+
+[node name="floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_obedb")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_l7037")

@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://s2nuj6id8q4s"]
+
+[ext_resource type="Script" path="res://Limb.gd" id="1_r5fjw"]
+
+[sub_resource type="Curve3D" id="Curve3D_6qy0o"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_klm54"]
+
+[node name="Limb" type="Node3D"]
+script = ExtResource("1_r5fjw")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+mode = 2
+path_node = NodePath("../Path3D")
+path_interval_type = 0
+path_interval = 1.0
+path_simplify_angle = 0.0
+path_rotation = 2
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_6qy0o")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_klm54")

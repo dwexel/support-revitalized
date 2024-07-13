@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=3 uid="uid://dqg5ary8cfhp8"]
+
+[ext_resource type="Script" path="res://scripts/tree.gd" id="1_4cr48"]
+[ext_resource type="PackedScene" uid="uid://s2nuj6id8q4s" path="res://objects/limb.tscn" id="2_5gweh"]
+[ext_resource type="Material" uid="uid://ch0ivxloqvypu" path="res://meshes/helper.material" id="4_yg7ih"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_g5tee"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wyfdc"]
+material = ExtResource("4_yg7ih")
+
+[sub_resource type="BoxMesh" id="BoxMesh_rwl53"]
+material = ExtResource("4_yg7ih")
+size = Vector3(10, 10, 10)
+
+[sub_resource type="GDScript" id="GDScript_y1aox"]
+resource_name = "camera_helper"
+script/source = "extends Camera3D
+@export var cam_distance = 10
+@onready var target_node: Node3D = get_parent()
+
+
+
+func _ready():
+	#size = 10
+	#fov = 25
+	#projection = Camera3D.PROJECTION_ORTHOGONAL
+	
+	#set_as_top_level(true)
+
+	var target_pos: Vector3 = target_node.global_transform.origin
+	var camera_pos = target_pos + (Vector3.UP + Vector3.BACK * sqrt(2) + Vector3.RIGHT) * cam_distance
+	
+	look_at_from_position(camera_pos, target_pos, Vector3.UP)
+	
+
+
+func _physics_process(delta):
+	#print(
+		#Input.get_axis(\"move_left\", \"move_right\")
+	#)
+	
+	transform = transform.rotated(Vector3.UP, delta * Input.get_axis(\"move_left\", \"move_right\"))
+	
+"
+
+[node name="Tree" type="Node3D"]
+script = ExtResource("1_4cr48")
+make_leafs = false
+leaf_mesh = SubResource("BoxMesh_g5tee")
+limb_scene = ExtResource("2_5gweh")
+
+[node name="TreeRootHelper" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)
+mesh = SubResource("BoxMesh_wyfdc")
+
+[node name="TreeSizeHelper" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 5, 5)
+visible = false
+mesh = SubResource("BoxMesh_rwl53")
+
+[node name="CameraHelper" type="Camera3D" parent="."]
+projection = 1
+size = 20.0
+script = SubResource("GDScript_y1aox")
+cam_distance = 20
