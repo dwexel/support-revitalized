@@ -57,19 +57,17 @@ extends Camera3D
 @export var cam_distance = 10
 @onready var target_node: Node3D = get_parent()
 
-#const camera_angle = (Vector3.UP + Vector3.BACK * sqrt(2) + Vector3.RIGHT)
+const camera_angle = (Vector3.UP + Vector3.BACK * sqrt(2) + Vector3.RIGHT)
 #const camera_angle_flat =  (Vector3.BACK * sqrt(2) + Vector3.RIGHT)
-
-const camera_angle = (Vector3.UP + Vector3.BACK + Vector3.RIGHT)
+#const camera_angle = (Vector3.UP + Vector3.BACK + Vector3.RIGHT)
 const camera_angle_flat =  (Vector3.BACK + Vector3.RIGHT)
-
-
+const world_angle = (Vector3.BACK + Vector3.RIGHT)
 
 
 func _ready():
 	size = 10
 	fov = 25
-	projection = Camera3D.PROJECTION_ORTHOGONAL
+	#projection = Camera3D.PROJECTION_ORTHOGONAL
 	set_as_top_level(true)
 	
 

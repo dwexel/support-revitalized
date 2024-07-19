@@ -1,15 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://s2nuj6id8q4s"]
-
-[ext_resource type="Script" path="res://Limb.gd" id="1_r5fjw"]
+[gd_scene load_steps=2 format=3 uid="uid://s2nuj6id8q4s"]
 
 [sub_resource type="Curve3D" id="Curve3D_6qy0o"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_klm54"]
-
 [node name="Limb" type="Node3D"]
-script = ExtResource("1_r5fjw")
 
 [node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+use_collision = true
+polygon = PackedVector2Array(0.762473, 0.448175, 0.558667, 0.721944, 0.330526, 0.715861, 0.071966, 0.56985, 0.0902173, 0.220034, 0.403531, 0.0375208, 0.64384, 0.177447)
 mode = 2
 path_node = NodePath("../Path3D")
 path_interval_type = 0
@@ -24,7 +21,4 @@ path_joined = false
 [node name="Path3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_6qy0o")
 
-[node name="Area3D" type="Area3D" parent="."]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("BoxShape3D_klm54")
+[node name="PathFollow3D" type="PathFollow3D" parent="Path3D"]
