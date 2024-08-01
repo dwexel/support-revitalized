@@ -1,3 +1,4 @@
+@tool
 class_name TreeObject
 extends Node3D
 
@@ -6,30 +7,46 @@ extends Node3D
 # prevent too sharply bends in the ropse
 
 
+#------------
+
 
 # r refers to distance in world space between final points
 # lower distanc w/ same # of cells means fewer final points
 
-const r = 3
+# controls density of the tree
+
+@export var r_distance: float = 3:
+	set(value):
+		r_distance = value
+		if Engine.is_editor_hint():
+			build()
+
 const k = 10
 
-const cell_size = r / sqrt(2)
+var cell_size = r_distance / sqrt(2)
 
-var w_cells: int
-var h_cells: int
-var d_cells: int
+# size in cells of the final tree
+# controls size of tree
 
-var x_hextents: float
-var y_hextents: float
-var z_hextents: float
+@export var w_cells: int = 10
+@export var h_cells: int = 10
+@export var d_cells: int = 10
+
+#@onready var x_hextents: float = (w_cells * cell_size)
+#@onready var y_hextents: float = (h_cells * cell_size)
+#@onready var z_hextents: float = (d_cells * cell_size)
+
+var x_hextents: float = (w_cells * cell_size)
+var y_hextents: float = (h_cells * cell_size)
+var z_hextents: float = (d_cells * cell_size)
 
 
 class Leaf:
 	var position: Vector3
 	var connections: Array[Leaf]
 
-var leafs_packed: Array[Leaf] = []
-var structure_root_s: Leaf = null
+
+#--------------------------------
 
 
 @onready var tree_root_helper: Node3D = $TreeRootHelper
@@ -39,10 +56,25 @@ var structure_root_s: Leaf = null
 @export_category('opts')
 @export var make_leafs: bool = true
 @export var make_limbs: bool = true
+@export var time_for_leafs: float 
+@export var rotate_leafs: bool
+@export var root_pos: Vector3:
+	set(value):
+		# node.. loaded in tool mode?
+		if Engine.is_editor_hint():
+			tree_root_helper.position = value
+			root_pos = value
+
+const prune_lev = 0
 
 @export_category('scenes')
 @export var leaf_mesh: Mesh
 @export var limb_scene: PackedScene
+@export var build_button: bool = false:
+	set(value):
+		build_button = false
+		if Engine.is_editor_hint():
+			build()
 
 
 
@@ -57,19 +89,22 @@ func from_spherical_annulus_around(p: Vector3):
 	var y = randfn(0, 1)
 	var z = randfn(0, 1)
 	
-	var radius = randf_range(r, 2*r)
+	var radius = randf_range(r_distance, 2*r_distance)
 	return p + Vector3(x, y, z).normalized() * radius
 
-func not_within_bounds(p: Vector3):
+
+func not_within_bounds(p: Vector3): # p is relative to parent
 	if p.x < 0: return true
 	if p.x > x_hextents: return true
 	if p.y < 0: return true
 	if p.y > y_hextents: return true
 	if p.z < 0: return true
 	if p.z > z_hextents: return true
-	
+
+	var globally_positioned_point = global_position + p
+
 	for a: AABB in do_not_build_space:
-		if a.has_point(p):
+		if a.has_point(globally_positioned_point):
 			return true
 
 func is_within_distance_r_of_existing(grid: Array, p: Vector3):
@@ -83,7 +118,7 @@ func is_within_distance_r_of_existing(grid: Array, p: Vector3):
 				var q = grid[c_x][c_y][c_z]
 				if q:
 					# hm
-					if q.position.distance_to(p) < r:
+					if q.position.distance_to(p) < r_distance:
 						return true
 	
 	return false
@@ -98,8 +133,6 @@ func insert_to_cell_grid(grid: Array, l: Leaf):
 
 
 func depth_of_tree(leaf: Leaf):
-	if not leaf:
-		return 0
 	var maxdepth = 0
 	for l in leaf.connections:
 		maxdepth = max(maxdepth, depth_of_tree(l))
@@ -135,6 +168,7 @@ func depth_of_tree_get_line(ll: Leaf):
 
 func get_curve(polyline: PackedVector3Array):
 	var curve: Curve3D = Curve3D.new()
+	
 	for i in polyline.size():
 		if i == 0:
 			curve.add_point(polyline[i])
@@ -151,24 +185,34 @@ func get_curve(polyline: PackedVector3Array):
 	return curve
 
 
+func prune(list: Array[Leaf], leaf: Leaf):
+	var maxdepth = 0
+	
+	for l in leaf.connections:
+		maxdepth = max(maxdepth, prune(list, l))
+	
+	if maxdepth > prune_lev: # set up
+		list.append(leaf)
+		
+	return maxdepth + 1
 
 
-func build():
-	
-	w_cells = 10
-	h_cells = 10
-	d_cells = 10
-	
-	# x_hextents = (w_cells * cell_size) / 2
-	# y_hextents = (h_cells * cell_size) / 2
-	# z_hextents = (d_cells * cell_size) / 2
-	
+
+
+
+func build_data():
+
+	# check if necessary
 	x_hextents = (w_cells * cell_size)
 	y_hextents = (h_cells * cell_size)
 	z_hextents = (d_cells * cell_size)
+
+
+	# shoud I return this?
+	var leafs_packed: Array[Leaf] = []
+
 	
 	# type this for real
-	
 	var grid = []
 	var active_list: Array[Leaf] = []
 
@@ -183,13 +227,12 @@ func build():
 
 	# check this exists
 
-	s.position = tree_root_helper.transform.origin
+	# s.position = tree_root_helper.transform.origin
+
+	s.position = $TreeRootHelper.transform.origin
 
 	if not_within_bounds(s.position):
-		
-		# higlight built in funcs
-
-		printerr('first node is excluded from growing area...')
+		printerr('first node {0} is excluded from growing area... '.format([s.position]))
 		return null
 
 	insert_to_cell_grid(grid, s)
@@ -225,116 +268,97 @@ func build():
 			
 		if no_such_point_found:
 			active_list.pop_at(i)
-			
-	structure_root_s = s
+
 	return s
 	
 
 
 
+# globally positioned boxes
 var do_not_build_space = []
+
 @onready var mm_instance = $MultiMeshInstance3D
 
 
-func _ready():
+func update_build_space():
+	for node in get_parent().get_children():
+		if node is DoNotBuild:
+			do_not_build_space.append(node.get_aabb())
+
+static func is_in_build_space(n: Node, global_point: Vector3):
+	#var sp: Array[AABB] = []
+
+	for node in n.get_parent().get_children():
+		if node is DoNotBuild:
+			if node.get_aabb().has_point(global_point):
+				return true
+			#sp.append(node.get_aabb())
 	
-	
-	var siblings = get_parent().get_children()
-	
-	for s in siblings:
-		if s.is_in_group('DoNotBuild'):
-			var o = s.get_aabb()
-			# limitation of aabb
-			print(o)
-			
-			do_not_build_space.append(AABB(s.position + o.position, o.size))
-	
-	#do_not_build_space.append($TreeSizeHelper.get_aabb())
+	return false
 
 
-	var s = build()
-	
+func build():
+	# remove limbs
+	for node: Node in get_children():
+		if node.has_node('Path3D'):
+			node.free()
+
+	update_build_space()
+
+	var s = build_data()
+
 	if not s:
-		printerr("huhh")
+		Audio.play("res://sounds/jump.ogg")
 		return null
-	
-	
+
+	var some_leafs: Array[Leaf] = [] 
+
+	prune(some_leafs, s)
+
 	# change shape but...
 	# have the start node be predictable still
-	
-	
-	#for l in leafs_packed:
-		#var factor = (l.position.y / y_hextents)
-		#factor = factor ** 3
-		#
-		#l.position.y = y_hextents * (1.0 - factor)
 
-	
-	print(global_position)
-	print(tree_root_helper.position)
-	print(s.position)
 	
 	if make_leafs:
 		var mm: MultiMesh = MultiMesh.new()
 		
 		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.instance_count = leafs_packed.size()
-		mm.visible_instance_count = leafs_packed.size()
+		mm.instance_count = some_leafs.size()
+		mm.visible_instance_count = some_leafs.size()
 		mm.mesh = leaf_mesh
 		
 		mm_instance.multimesh = mm
-		
-		# as added
-		# each position relative to ... zero
 		mm_instance.position = Vector3.ZERO 
-		
-		
-		var y_space = y_hextents
-		
-		
-		for i: int in leafs_packed.size():
-			var l: Leaf = leafs_packed[i] 
+						
+		for i: int in some_leafs.size():
+			var l: Leaf = some_leafs[i] 
 			
-			#mm.set_instance_transform(i, Transform3D(Basis().rotated(Vector3.UP, randf_range(0, 6)), l.position))
-			mm.set_instance_transform(i, Transform3D(Basis(), l.position))
-			
-			
+			var bas
+			if rotate_leafs:
+				bas = Basis().rotated(Vector3.UP, randf_range(0, 6))
+			else:
+				bas = Basis()
 
+			mm.set_instance_transform(i, Transform3D(bas, l.position))
+			
 			var v = Tween.interpolate_value(
 				0.0,
-				0.1,
+				#0.1,
+				time_for_leafs,
 				i,
-				leafs_packed.size(),
+				some_leafs.size(),
 				Tween.TRANS_BACK,
 				Tween.EASE_IN, 
 			)
 			
 			await get_tree().create_timer(v).timeout
 	
-	
-	
-	if not make_limbs:
-		return
-	
-	
-	var longest_pl = depth_of_tree_get_line(s)
-	var curve = get_curve(longest_pl.line)
-	
-	print(curve.get_point_position(0))
-	
-	var limb = limb_scene.instantiate()
-	add_child(limb)
-	limb.position = Vector3.ZERO
-	limb.get_node("Path3D").curve = curve
-	
-	
-	print('done1')
-	done_readying.emit()
-
-signal done_readying
-
-
-
-
-func _on_button_pressed():
-	get_tree().reload_current_scene()
+	if make_limbs:
+		var limb: LimbObject = limb_scene.instantiate()
+		
+		var longest_pl = depth_of_tree_get_line(s)
+		var curve = get_curve(longest_pl.line)
+		
+		add_child(limb)
+		limb.get_node(^"Path3D").curve = curve
+		

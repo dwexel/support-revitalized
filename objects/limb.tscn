@@ -1,16 +1,29 @@
-[gd_scene load_steps=2 format=3 uid="uid://s2nuj6id8q4s"]
+[gd_scene load_steps=5 format=3 uid="uid://s2nuj6id8q4s"]
+
+[ext_resource type="Script" path="res://objects/limb.gd" id="1_1q2fi"]
+[ext_resource type="Material" uid="uid://xho61xunovxn" path="res://meshes/helper_material.tres" id="2_y577w"]
 
 [sub_resource type="Curve3D" id="Curve3D_6qy0o"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_rins0"]
+material = ExtResource("2_y577w")
 
 [node name="Limb" type="Node3D"]
+script = ExtResource("1_1q2fi")
 
 [node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+top_level = true
 use_collision = true
 polygon = PackedVector2Array(0.762473, 0.448175, 0.558667, 0.721944, 0.330526, 0.715861, 0.071966, 0.56985, 0.0902173, 0.220034, 0.403531, 0.0375208, 0.64384, 0.177447)
 mode = 2
 path_node = NodePath("../Path3D")
 path_interval_type = 0
-path_interval = 1.0
+path_interval = 0.15
 path_simplify_angle = 0.0
 path_rotation = 2
 path_local = false
@@ -22,3 +35,10 @@ path_joined = false
 curve = SubResource("Curve3D_6qy0o")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Path3D"]
+transform = Transform3D(-4.37113e-08, 0.999997, -4.37114e-08, 0, -4.37113e-08, -1, -0.999997, -4.37113e-08, 1.91069e-15, 0.415, -1.81402e-08, -0.37)
+h_offset = 0.37
+v_offset = 0.415
+loop = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Path3D/PathFollow3D"]
+mesh = SubResource("BoxMesh_rins0")

@@ -1,57 +1,74 @@
-[gd_scene load_steps=7 format=3 uid="uid://dqg5ary8cfhp8"]
+[gd_scene load_steps=10 format=3 uid="uid://dqg5ary8cfhp8"]
 
 [ext_resource type="Script" path="res://scripts/tree.gd" id="1_4cr48"]
+[ext_resource type="Material" uid="uid://bce2gajqsxqs" path="res://meshes/leaf.tres" id="2_4imw7"]
 [ext_resource type="PackedScene" uid="uid://s2nuj6id8q4s" path="res://objects/limb.tscn" id="2_5gweh"]
-[ext_resource type="Material" uid="uid://ch0ivxloqvypu" path="res://meshes/helper.material" id="4_yg7ih"]
+[ext_resource type="Material" uid="uid://xho61xunovxn" path="res://meshes/helper_material.tres" id="4_1wtqa"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_ojta3"]
-size = Vector3(0.5, 0.5, 0.5)
+[sub_resource type="QuadMesh" id="QuadMesh_6gmof"]
+material = ExtResource("2_4imw7")
 
 [sub_resource type="BoxMesh" id="BoxMesh_wyfdc"]
-material = ExtResource("4_yg7ih")
+material = ExtResource("4_1wtqa")
 
-[sub_resource type="GDScript" id="GDScript_y1aox"]
-resource_name = "camera_helper"
-script/source = "extends Camera3D
-@export var cam_distance = 10
-@onready var target_node: Node3D = get_parent()
+[sub_resource type="GDScript" id="GDScript_nb6is"]
+script/source = "@tool
+extends MeshInstance3D
 
 
-
+# Called when the node enters the scene tree for the first time.
 func _ready():
-	
-	var target_pos: Vector3 = target_node.global_transform.origin
-	
-	#var target_pos = Vector3.ZERO
-	
-	var camera_pos = target_pos + (Vector3.UP + Vector3.BACK * sqrt(2) + Vector3.RIGHT) * cam_distance
-	look_at_from_position(camera_pos, target_pos, Vector3.UP)
-	
+	pass # Replace with function body.
 
 
-func _physics_process(delta):
-	
-	size += Input.get_axis(\"move_forward\", \"move_back\")
-	
-	transform = transform.rotated(Vector3.UP, delta * Input.get_axis(\"move_left\", \"move_right\"))
-	
-	
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
 "
 
-[node name="Tree" type="Node3D"]
+[sub_resource type="MultiMesh" id="MultiMesh_15jur"]
+transform_format = 1
+instance_count = 42
+visible_instance_count = 42
+mesh = SubResource("QuadMesh_6gmof")
+buffer = PackedFloat32Array(-0.349408, 0, -0.936971, 7.44367, 0, 1, 0, 3.70969, 0.936971, 0, -0.349408, 0.818746, -0.829713, 0, -0.558191, 4.52489, 0, 1, 0, 3.35485, 0.558191, 0, -0.829713, 1.58342, -0.966935, 0, 0.255024, 8.50722, 0, 1, 0, 1.97393, -0.255024, 0, -0.966935, 1.76138, -0.940659, 0, -0.339354, 1.26263, 0, 1, 0, 2.45099, 0.339354, 0, -0.940659, 6.43371, 0.195288, 0, 0.980746, 1.73008, 0, 1, 0, 5.75057, -0.980746, 0, 0.195288, 0.805082, -0.733792, 0, 0.679374, 2.00296, 0, 1, 0, 4.96763, -0.679374, 0, -0.733792, 3.00901, -0.888786, 0, -0.458322, 1.90283, 0, 1, 0, 2.39676, 0.458322, 0, -0.888786, 4.47232, 0.884377, 0, -0.466774, 4.82926, 0, 1, 0, 0.0446036, 0.466774, 0, 0.884377, 3.80892, 0.0397932, 0, 0.999208, 4.45073, 0, 1, 0, 2.61725, -0.999208, 0, 0.0397932, 3.92707, -0.857173, 0, 0.515029, 6.98809, 0, 1, 0, 4.71835, -0.515029, 0, -0.857173, 9.14643, -0.883996, 0, -0.467494, 9.37296, 0, 1, 0, 10.0167, 0.467494, 0, -0.883996, 4.81201, 0.376593, 0, -0.926379, 7.62118, 0, 1, 0, 6.16787, 0.926379, 0, 0.376593, 0.921063, -0.995428, 0, -0.0955135, 3.0318, 0, 1, 0, 9.0822, 0.0955135, 0, -0.995428, 0.137077, -0.890954, 0, 0.454093, 5.80251, 0, 1, 0, 9.54274, -0.454093, 0, -0.890954, 0.91826, 0.0386088, 0, 0.999254, 7.42836, 0, 1, 0, 8.11629, -0.999254, 0, 0.0386088, 1.99602, -0.656812, 0, 0.754054, 6.78439, 0, 1, 0, 10.369, -0.754054, 0, -0.656812, 6.94056, -0.292564, 0, -0.956246, 6.00223, 0, 1, 0, 10.4623, 0.956246, 0, -0.292564, 9.06237, 0.687123, 0, 0.726542, 3.68362, 0, 1, 0, 9.69596, -0.726542, 0, 0.687123, 9.47903, -0.400469, 0, 0.91631, 3.08056, 0, 1, 0, 9.28448, -0.91631, 0, -0.400469, 7.11498, 0.270033, 0, -0.962851, 5.8482, 0, 1, 0, 8.3951, 0.962851, 0, 0.270033, 5.11303, 0.789928, 0, 0.6132, 8.85067, 0, 1, 0, 7.50748, -0.6132, 0, 0.789928, 5.12341, 0.801836, 0, 0.597544, 7.30174, 0, 1, 0, 8.72313, -0.597544, 0, 0.801836, 9.48181, -0.355218, 0, -0.934783, 8.80967, 0, 1, 0, 8.22115, 0.934783, 0, -0.355218, 8.06857, 0.766571, 0, -0.64216, 8.19745, 0, 1, 0, 6.14102, 0.64216, 0, 0.766571, 7.91705, -0.931662, 0, -0.363327, 3.91278, 0, 1, 0, 6.30381, 0.363327, 0, -0.931662, 3.42589, 0.357085, 0, -0.934072, 9.63424, 0, 1, 0, 8.26969, 0.934072, 0, 0.357085, 3.10324, 0.944988, 0, -0.327105, 6.51523, 0, 1, 0, 6.6269, 0.327105, 0, 0.944988, 3.15445, -0.153636, 0, -0.988128, 7.15474, 0, 1, 0, 6.07326, 0.988128, 0, -0.153636, 5.04087, -0.967475, 0, 0.252966, 8.37856, 0, 1, 0, 4.17423, -0.252966, 0, -0.967475, 4.9202, -0.788838, 0, -0.614601, 5.84684, 0, 1, 0, 0.0309016, 0.614601, 0, -0.788838, 7.92823, -0.987936, 0, -0.154865, 4.85094, 0, 1, 0, 4.68896, 0.154865, 0, -0.987936, 7.34376, 0.867829, 0, 0.496863, 5.064, 0, 1, 0, 2.45108, -0.496863, 0, 0.867829, 8.50072, -0.602366, 0, -0.79822, 7.95454, 0, 1, 0, 1.51216, 0.79822, 0, -0.602366, 6.8791, 0.0465754, 0, -0.998915, 8.44243, 0, 1, 0, 4.37891, 0.998915, 0, 0.0465754, 2.838, 0.88508, 0, -0.465438, 6.8995, 0, 1, 0, 4.06446, 0.465438, 0, 0.88508, 6.40568, 0.327693, 0, -0.944784, 7.04863, 0, 1, 0, 1.48557, 0.944784, 0, 0.327693, 8.66237, -0.91151, 0, -0.411279, 2.82303, 0, 1, 0, 3.65246, 0.411279, 0, -0.91151, 9.75525, 0.451066, 0, -0.892491, 1.7017, 0, 1, 0, 4.55011, 0.892491, 0, 0.451066, 6.19239, -0.48104, 0, 0.876699, 3.57472, 0, 1, 0, 3.33154, -0.876699, 0, -0.48104, 6.20933, -0.565402, 0, -0.824816, 2.3054, 0, 1, 0, 0.365863, 0.824816, 0, -0.565402, 7.12784, 0.202348, 0, 0.979314, 4.72569, 0, 1, 0, 0.584949, -0.979314, 0, 0.202348, 6.148, -0.0657509, 0, 0.997836, 6.65963, 0, 1, 0, 2.18083, -0.997836, 0, -0.0657509, 3.61395)
+
+[sub_resource type="GDScript" id="GDScript_ocijj"]
+script/source = "@tool
+extends MultiMeshInstance3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[node name="Node3D" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.24882, 1.90735e-06, 6.2227)
 script = ExtResource("1_4cr48")
-leaf_mesh = SubResource("BoxMesh_ojta3")
+r_distance = 2.0
+w_cells = 5
+h_cells = 5
+d_cells = 5
+time_for_leafs = 0.1
+rotate_leafs = true
+leaf_mesh = SubResource("QuadMesh_6gmof")
 limb_scene = ExtResource("2_5gweh")
 
-[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
-
-[node name="TreeRootHelper" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2532, 1, 13.7411)
+[node name="origin" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_wyfdc")
 
-[node name="CameraHelper" type="Camera3D" parent="TreeRootHelper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.2532, -1, -13.7411)
-projection = 1
-size = 20.0
-script = SubResource("GDScript_y1aox")
-cam_distance = 20
+[node name="TreeRootHelper" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.65963, 2.18083, 3.61395)
+mesh = SubResource("BoxMesh_wyfdc")
+skeleton = NodePath("")
+script = SubResource("GDScript_nb6is")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_15jur")
+script = SubResource("GDScript_ocijj")
